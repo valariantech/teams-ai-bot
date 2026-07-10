@@ -3,6 +3,7 @@ import {
   CloudAdapter,
   ConfigurationBotFrameworkAuthentication,
   ConfigurationServiceClientCredentialFactory,
+  TurnContext,
 } from "botbuilder";
 import app from "./app";
 import config from "./config";
@@ -16,7 +17,10 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
   })
 );
 const adapter = new CloudAdapter(botFrameworkAuthentication);
-const onTurnErrorHandler = async (context, error) => {
+const onTurnErrorHandler = async (
+  context: TurnContext,
+  error: Error
+) => {
   console.error(`\n [onTurnError] unhandled error: ${error}`);
   await context.sendTraceActivity(
     "OnTurnError Trace",

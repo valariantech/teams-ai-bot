@@ -3,12 +3,14 @@
     "strict": true,
     "declaration": true,
     "target": "es2017",
-    "module": "commonjs",
+    "module": "Node16",
+    "moduleResolution": "node16",
     "outDir": "./lib",
     "rootDir": "./",
     "sourceMap": true,
     "incremental": true,
     "tsBuildInfoFile": "./lib/.tsbuildinfo",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
   }
 }
