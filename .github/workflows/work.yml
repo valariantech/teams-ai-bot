@@ -2,9 +2,17 @@ name: work
 
 on:
   workflow_dispatch:
+    inputs:
+      push_changes:
+        description: "Allow the workflow to commit and push generated changes"
+        required: false
+        default: false
+        type: boolean
   schedule:
     # Syntax: https://crontab.guru
     - cron: "29 8 1-31 * *"
+permissions:
+  contents: write
 env:
   date: ""
 jobs:
@@ -19,8 +27,6 @@ jobs:
           node-version: ">=20.10.0"
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
       - name: Weekly
         if: ${{contains(env.date, 'Tue')}}
         run: |
@@ -35,16 +41,21 @@ jobs:
         env:
           committer_email: ${{ vars.COMMITTER_EMAIL }}
           committer_name: ${{ vars.COMMITTER_NAME }}
-          token: ${{ secrets.AUTO_COMMITTER_TOKEN }}
         run: |
           sed -r "s/@@@/$date/" ./reamde.md > ./README.md
           sed -r "s/@@@/$date/" ./src/index.ts > ./src/index-dev.ts
           sed -r "s/@@@/$date/" ./src/app.ts > ./src/app-dev.ts
           sed -r "s/@@@/$date/" ./src/creator.ts > ./src/creator-dev.ts
+      - name: Commit and push changes
+        if: ${{ github.event_name == 'schedule' || inputs.push_changes }}
+        env:
+          committer_email: ${{ vars.COMMITTER_EMAIL }}
+          committer_name: ${{ vars.COMMITTER_NAME }}
+        run: |
           git config --global user.email $committer_email
           git config --global user.name $committer_name
-          git remote set-url origin "https://x-access-token:$token@github.com/${{ github.repository }}"
           git status
           git add -A
-          git commit -a -m "Updated MS AI Bot to $date"          
+          git diff --cached --quiet && exit 0
+          git commit -m "Updated MS AI Bot to $date"
           git push
