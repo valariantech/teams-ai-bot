@@ -1,6 +1,7 @@
 name: work
 
 on:
+  workflow_dispatch:
   schedule:
     # Syntax: https://crontab.guru
     - cron: "29 8 1-31 * *"
