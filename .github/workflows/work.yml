@@ -27,6 +27,8 @@ jobs:
           node-version: ">=20.10.0"
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Weekly
         if: ${{contains(env.date, 'Tue')}}
         run: |
@@ -51,11 +53,15 @@ jobs:
         env:
           committer_email: ${{ vars.COMMITTER_EMAIL }}
           committer_name: ${{ vars.COMMITTER_NAME }}
+          github_token: ${{ github.token }}
         run: |
           git config --global user.email $committer_email
           git config --global user.name $committer_name
           git status
-          git add -A
+          git add README.md package.json package-lock.json src/app-dev.ts src/creator-dev.ts src/index-dev.ts
+          if [[ "$date" == *Tue* ]]; then
+            git add src/*.ts
+          fi
           git diff --cached --quiet && exit 0
           git commit -m "Updated MS AI Bot to $date"
-          git push
+          git push "https://x-access-token:${github_token}@github.com/${{ github.repository }}.git" "HEAD:${{ github.ref_name }}"
