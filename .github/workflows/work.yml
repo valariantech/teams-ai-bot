@@ -18,7 +18,9 @@ jobs:
         with:
           node-version: ">=20.10.0"
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Weekly
         if: ${{contains(env.date, 'Tue')}}
         run: |
